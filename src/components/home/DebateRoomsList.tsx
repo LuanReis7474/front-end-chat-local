@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { DebateRoomCard } from "@/components/DebateRoomCard";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const debateRooms = [
   {
@@ -39,18 +42,42 @@ const debateRooms = [
 ];
 
 export const DebateRoomsList = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRooms = debateRooms.filter((room) =>
+    room.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-3">
-      {debateRooms.map((room) => (
-        <DebateRoomCard 
-          key={room.id}
-          id={room.id}
-          title={room.title}
-          participants={room.participants}
-          distance={room.distance}
-          lastMessage={room.lastMessage}
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar salas por tema..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
         />
-      ))}
+      </div>
+      
+      <div className="space-y-3">
+        {filteredRooms.length > 0 ? (
+          filteredRooms.map((room) => (
+            <DebateRoomCard 
+              key={room.id}
+              id={room.id}
+              title={room.title}
+              participants={room.participants}
+              distance={room.distance}
+              lastMessage={room.lastMessage}
+            />
+          ))
+        ) : (
+          <p className="text-center text-muted-foreground py-8">
+            Nenhuma sala encontrada
+          </p>
+        )}
+      </div>
     </div>
   );
 };

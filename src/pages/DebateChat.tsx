@@ -39,6 +39,7 @@ export const DebateChat = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const nickname = localStorage.getItem("redondeza_nickname") || "Você";
+  const isModerator = localStorage.getItem("redondeza_moderator") === "true";
   
   const room = mockDebateRooms[id as keyof typeof mockDebateRooms];
   const [messages, setMessages] = useState<Message[]>(room?.messages || []);
@@ -61,6 +62,11 @@ export const DebateChat = () => {
     };
     setMessages([...messages, newMessage]);
     toast.success("Mensagem enviada!");
+  };
+
+  const handleDeleteMessage = (messageId: number) => {
+    setMessages(messages.filter(msg => msg.id !== messageId));
+    toast.success("Mensagem deletada");
   };
 
   return (
@@ -89,10 +95,13 @@ export const DebateChat = () => {
         {messages.map((msg) => (
           <ChatMessage
             key={msg.id}
+            id={msg.id}
             author={msg.author}
             message={msg.message}
             time={msg.time}
             isOwn={msg.isOwn}
+            isModerator={isModerator}
+            onDelete={handleDeleteMessage}
           />
         ))}
         <div ref={messagesEndRef} />

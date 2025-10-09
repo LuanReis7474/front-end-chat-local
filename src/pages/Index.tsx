@@ -1,14 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from "react";
+import { Onboarding } from "@/components/Onboarding";
+import { Home } from "./Home";
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [nickname, setNickname] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check if user has already completed onboarding
+    const savedNickname = localStorage.getItem("redondeza_nickname");
+    if (savedNickname) {
+      setNickname(savedNickname);
+    }
+  }, []);
+
+  const handleOnboardingComplete = (userNickname: string) => {
+    localStorage.setItem("redondeza_nickname", userNickname);
+    setNickname(userNickname);
+  };
+
+  if (!nickname) {
+    return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
+
+  return <Home nickname={nickname} />;
 };
 
 export default Index;

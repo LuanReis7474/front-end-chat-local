@@ -1,8 +1,10 @@
 import { Calendar, MapPin, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 interface EventCardProps {
+  id: number;
   title: string;
   date: string;
   time: string;
@@ -10,10 +12,10 @@ interface EventCardProps {
   distance: string;
   interested: number;
   featured?: boolean;
-  onClick?: () => void;
 }
 
 export const EventCard = ({
+  id,
   title,
   date,
   time,
@@ -21,14 +23,15 @@ export const EventCard = ({
   distance,
   interested,
   featured = false,
-  onClick,
 }: EventCardProps) => {
+  const navigate = useNavigate();
+  
   return (
     <Card
       className={`cursor-pointer transition-all hover:scale-[1.02] hover:shadow-card ${
         featured ? "bg-gradient-card border-primary/20" : ""
       }`}
-      onClick={onClick}
+      onClick={() => navigate(`/event/${id}`)}
     >
       <CardContent className="p-5 space-y-3">
         <div className="flex items-start justify-between gap-3">

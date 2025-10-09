@@ -1,25 +1,28 @@
 import { MessageCircle, Users, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface DebateRoomCardProps {
+  id: number;
   title: string;
   participants: number;
   distance: string;
   lastMessage?: string;
-  onClick?: () => void;
 }
 
 export const DebateRoomCard = ({
+  id,
   title,
   participants,
   distance,
   lastMessage,
-  onClick,
 }: DebateRoomCardProps) => {
+  const navigate = useNavigate();
+  
   return (
     <Card
       className="cursor-pointer transition-all hover:scale-[1.01] hover:shadow-card"
-      onClick={onClick}
+      onClick={() => navigate(`/debate/${id}`)}
     >
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">

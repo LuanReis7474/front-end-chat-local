@@ -42,7 +42,14 @@ export const DebateRoomsList = () => {
   return (
     <div className="space-y-3">
       {debateRooms.map((room) => (
-        <DebateRoomCard key={room.id} {...room} />
+        <DebateRoomCard 
+          key={room.id}
+          id={room.id}
+          title={room.title}
+          participants={room.participants}
+          distance={room.distance}
+          lastMessage={room.lastMessage}
+        />
       ))}
     </div>
   );

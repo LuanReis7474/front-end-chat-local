@@ -45,6 +45,33 @@ const featuredEvents: Event[] = [
     distance: "800m",
     interested: 67,
   },
+  {
+    id: 4,
+    title: "Aula de Yoga ao Ar Livre",
+    date: "Quinta",
+    time: "07:00",
+    location: "Jardim Botânico",
+    distance: "1.5km",
+    interested: 35,
+  },
+  {
+    id: 5,
+    title: "Festival Gastronômico",
+    date: "Sábado",
+    time: "17:00",
+    location: "Rua das Flores",
+    distance: "600m",
+    interested: 89,
+  },
+  {
+    id: 6,
+    title: "Cinema na Praça",
+    date: "Sexta",
+    time: "20:00",
+    location: "Praça do Sol",
+    distance: "900m",
+    interested: 54,
+  },
 ];
 
 export const EventCarousel = () => {

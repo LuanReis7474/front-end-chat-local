@@ -1,5 +1,6 @@
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, UserCog, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,7 @@ interface ChatMessageProps {
   time: string;
   isOwn?: boolean;
   isModerator?: boolean;
+  isModeratorMessage?: boolean;
   onDelete?: (id: number) => void;
 }
 
@@ -24,12 +26,19 @@ export const ChatMessage = ({
   time, 
   isOwn = false,
   isModerator = false,
+  isModeratorMessage = false,
   onDelete 
 }: ChatMessageProps) => {
   return (
     <div className={`flex flex-col gap-1 ${isOwn ? "items-end" : "items-start"}`}>
       <div className="flex items-center gap-2 text-sm">
         <span className="font-medium text-foreground">{author}</span>
+        {isModeratorMessage && (
+          <Badge variant="secondary" className="gap-1 text-xs h-5">
+            <UserCog className="w-3 h-3" />
+            Moderador
+          </Badge>
+        )}
         <span className="text-xs text-muted-foreground">{time}</span>
       </div>
       <div className="flex items-start gap-2 max-w-[85%]">
@@ -56,9 +65,10 @@ export const ChatMessage = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                className="text-destructive"
+                className="text-destructive focus:text-destructive"
                 onClick={() => onDelete(id)}
               >
+                <Trash2 className="mr-2 h-4 w-4" />
                 Deletar mensagem
               </DropdownMenuItem>
             </DropdownMenuContent>

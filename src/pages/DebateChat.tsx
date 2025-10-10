@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { toast } from "sonner";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface Message {
   id: number;
@@ -12,6 +13,7 @@ interface Message {
   message: string;
   time: string;
   isOwn: boolean;
+  isModeratorMessage?: boolean;
 }
 
 const mockDebateRooms = {
@@ -19,17 +21,17 @@ const mockDebateRooms = {
     title: "Novidades na feira do bairro",
     participants: 12,
     messages: [
-      { id: 1, author: "Maria S.", message: "Alguém sabe se terá frutas orgânicas?", time: "14:23", isOwn: false },
-      { id: 2, author: "João P.", message: "Sim! Confirmaram verduras e frutas orgânicas", time: "14:25", isOwn: false },
-      { id: 3, author: "Ana L.", message: "Ótimo! Vou levar sacolas reutilizáveis", time: "14:27", isOwn: false },
+      { id: 1, author: "Maria S.", message: "Alguém sabe se terá frutas orgânicas?", time: "14:23", isOwn: false, isModeratorMessage: false },
+      { id: 2, author: "João P.", message: "Sim! Confirmaram verduras e frutas orgânicas", time: "14:25", isOwn: false, isModeratorMessage: true },
+      { id: 3, author: "Ana L.", message: "Ótimo! Vou levar sacolas reutilizáveis", time: "14:27", isOwn: false, isModeratorMessage: false },
     ]
   },
   "2": {
     title: "Problemas com iluminação pública",
     participants: 8,
     messages: [
-      { id: 1, author: "Carlos M.", message: "A Rua das Flores está sem luz há 3 dias", time: "10:15", isOwn: false },
-      { id: 2, author: "Rita S.", message: "Vou entrar em contato com a prefeitura", time: "10:20", isOwn: false },
+      { id: 1, author: "Carlos M.", message: "A Rua das Flores está sem luz há 3 dias", time: "10:15", isOwn: false, isModeratorMessage: false },
+      { id: 2, author: "Rita S.", message: "Vou entrar em contato com a prefeitura", time: "10:20", isOwn: false, isModeratorMessage: true },
     ]
   },
 };
@@ -39,7 +41,7 @@ export const DebateChat = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const nickname = localStorage.getItem("redondeza_nickname") || "Você";
-  const isModerator = localStorage.getItem("redondeza_moderator") === "true";
+  const { isModerator } = useUserRole();
   
   const room = mockDebateRooms[id as keyof typeof mockDebateRooms];
   const [messages, setMessages] = useState<Message[]>(room?.messages || []);
@@ -101,6 +103,7 @@ export const DebateChat = () => {
             time={msg.time}
             isOwn={msg.isOwn}
             isModerator={isModerator}
+            isModeratorMessage={msg.isModeratorMessage}
             onDelete={handleDeleteMessage}
           />
         ))}

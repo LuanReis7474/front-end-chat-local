@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { toast } from "sonner";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface Message {
   id: number;
@@ -12,6 +13,7 @@ interface Message {
   message: string;
   time: string;
   isOwn: boolean;
+  isModeratorMessage?: boolean;
 }
 
 const mockEvents = {
@@ -23,9 +25,9 @@ const mockEvents = {
     distance: "500m",
     interested: 42,
     messages: [
-      { id: 1, author: "Pedro A.", message: "Alguém vai levar as crianças?", time: "09:15", isOwn: false },
-      { id: 2, author: "Laura M.", message: "Sim! Vai ter atividades para elas", time: "09:18", isOwn: false },
-      { id: 3, author: "Bruno K.", message: "Que horas chegam lá?", time: "09:20", isOwn: false },
+      { id: 1, author: "Pedro A.", message: "Alguém vai levar as crianças?", time: "09:15", isOwn: false, isModeratorMessage: false },
+      { id: 2, author: "Laura M.", message: "Sim! Vai ter atividades para elas", time: "09:18", isOwn: false, isModeratorMessage: true },
+      { id: 3, author: "Bruno K.", message: "Que horas chegam lá?", time: "09:20", isOwn: false, isModeratorMessage: false },
     ]
   },
   "4": {
@@ -36,8 +38,8 @@ const mockEvents = {
     distance: "650m",
     interested: 15,
     messages: [
-      { id: 1, author: "Camila R.", message: "Qual livro vamos discutir?", time: "16:30", isOwn: false },
-      { id: 2, author: "Rafael T.", message: "Capitães da Areia, do Jorge Amado", time: "16:35", isOwn: false },
+      { id: 1, author: "Camila R.", message: "Qual livro vamos discutir?", time: "16:30", isOwn: false, isModeratorMessage: false },
+      { id: 2, author: "Rafael T.", message: "Capitães da Areia, do Jorge Amado", time: "16:35", isOwn: false, isModeratorMessage: true },
     ]
   },
 };
@@ -47,7 +49,7 @@ export const EventChat = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const nickname = localStorage.getItem("redondeza_nickname") || "Você";
-  const isModerator = localStorage.getItem("redondeza_moderator") === "true";
+  const { isModerator } = useUserRole();
   
   const event = mockEvents[id as keyof typeof mockEvents];
   const [messages, setMessages] = useState<Message[]>(event?.messages || []);
@@ -119,6 +121,7 @@ export const EventChat = () => {
             time={msg.time}
             isOwn={msg.isOwn}
             isModerator={isModerator}
+            isModeratorMessage={msg.isModeratorMessage}
             onDelete={handleDeleteMessage}
           />
         ))}

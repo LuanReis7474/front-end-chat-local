@@ -3,6 +3,9 @@ import { EventCarousel } from "@/components/home/EventCarousel";
 import { EventsList } from "@/components/home/EventsList";
 import { DebateRoomsList } from "@/components/home/DebateRoomsList";
 import { FloatingRewardButton } from "@/components/RewardWheel";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
 interface HomeProps {
   nickname: string;
@@ -13,12 +16,25 @@ export const Home = ({ nickname }: HomeProps) => {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-gradient-primary p-6 pb-8">
-        <h1 className="text-2xl font-bold text-primary-foreground">
-          Olá, {nickname}! 👋
-        </h1>
-        <p className="text-primary-foreground/90 mt-1">
-          Veja o que está acontecendo ao seu redor
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-primary-foreground">
+              Olá, {nickname}! 👋
+            </h1>
+            <p className="text-primary-foreground/90 mt-1">
+              Veja o que está acontecendo ao seu redor
+            </p>
+          </div>
+          <Button 
+            variant="secondary" 
+            size="sm"
+            onClick={() => toast.info("Funcionalidade de criar conta em breve!")}
+            className="flex items-center gap-2"
+          >
+            <UserPlus className="h-4 w-4" />
+            Criar Conta
+          </Button>
+        </div>
       </div>
 
       {/* Featured Events Carousel */}

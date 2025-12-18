@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import CreateAccount from "./pages/CreateAccount";
 import Login from "./pages/Login";
 import { CreateRoom } from './pages/CreateRoom';
+import { Home } from '../src/pages/Home';
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/:id" element={<Index />} />
+          <Route path="/home/:id" element={<Home nickname="" />}></Route>
           <Route path="/debate/:id" element={<DebateChat />} />
           <Route path="/event/:id" element={<EventChat />} />
           <Route path="/create-account" element={<CreateAccount />} />
@@ -29,8 +31,8 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </TooltipProvider >
+  </QueryClientProvider >
 );
 
 export default App;

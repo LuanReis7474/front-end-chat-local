@@ -13,8 +13,10 @@ const Index = () => {
     }
   }, []);
 
-  const handleOnboardingComplete = (userNickname: string) => {
+  const handleOnboardingComplete = (userNickname: string, pos: { lati: number; long: number }) => {
     localStorage.setItem("redondeza_nickname", userNickname);
+    localStorage.setItem("latitude", pos.lati.toString());
+    localStorage.setItem("longitude", pos.long.toString());
     setNickname(userNickname);
   };
 

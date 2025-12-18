@@ -6,6 +6,9 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
+import { jwtDecode } from "jwt-decode";
+import { handleEnterRoom } from "@/services/RoomService";
+import { io, Socket } from "socket.io-client";
 
 interface Message {
   id: number;
@@ -16,59 +19,116 @@ interface Message {
   isModeratorMessage?: boolean;
 }
 
-const mockDebateRooms = {
-  "1": {
-    title: "Novidades na feira do bairro",
-    participants: 12,
-    messages: [
-      { id: 1, author: "Maria S.", message: "Alguém sabe se terá frutas orgânicas?", time: "14:23", isOwn: false, isModeratorMessage: false },
-      { id: 2, author: "João P.", message: "Sim! Confirmaram verduras e frutas orgânicas", time: "14:25", isOwn: false, isModeratorMessage: true },
-      { id: 3, author: "Ana L.", message: "Ótimo! Vou levar sacolas reutilizáveis", time: "14:27", isOwn: false, isModeratorMessage: false },
-    ]
-  },
-  "2": {
-    title: "Problemas com iluminação pública",
-    participants: 8,
-    messages: [
-      { id: 1, author: "Carlos M.", message: "A Rua das Flores está sem luz há 3 dias", time: "10:15", isOwn: false, isModeratorMessage: false },
-      { id: 2, author: "Rita S.", message: "Vou entrar em contato com a prefeitura", time: "10:20", isOwn: false, isModeratorMessage: true },
-    ]
-  },
-};
+interface TokenPayload {
+  sub: string;
+  email: string;
+  name?: string;
+  exp: number;
+}
+
+const SOCKET_URL = "http://localhost:3000";
 
 export const DebateChat = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+
+  const socketRef = useRef<Socket | null>(null);
+
   const nickname = localStorage.getItem("redondeza_nickname") || "Você";
   const { isModerator } = useUserRole();
-  
-  const room = mockDebateRooms[id as keyof typeof mockDebateRooms];
-  const [messages, setMessages] = useState<Message[]>(room?.messages || []);
 
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [datasUser, setDatasUser] = useState<TokenPayload | null>(null);
+  const [participantsCount, setParticipantsCount] = useState(0);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token && id) {
+      try {
+        const decoded = jwtDecode<TokenPayload>(token);
+        setDatasUser(decoded);
+
+        handleEnterRoom(Number(id), Number(decoded.sub))
+          .then((res) => {
+
+          })
+          .catch(console.error);
+
+
+        const newSocket = io(SOCKET_URL);
+        socketRef.current = newSocket;
+
+        // Entra no canal da sala
+        newSocket.emit("join_room_channel", { roomId: Number(id) });
+
+        // --- LISTENERS (Ouvintes) ---
+
+        // Quando receber uma NOVA MENSAGEM do servidor
+        newSocket.on("new_message", (payload: any) => {
+          // Mapeia o dado do Back para o formato do Front
+          const incomingMsg: Message = {
+            id: payload.id,
+            message: payload.content,
+            time: payload.time,
+            // Lógica simples: Se o ID do remetente for igual ao meu token, sou eu.
+            isOwn: payload.senderId === Number(decoded.sub),
+            author: payload.senderId === Number(decoded.sub) ? "Você" : `Usuário ${payload.senderId}`,
+            isModeratorMessage: false
+          };
+
+          setMessages((prev) => [...prev, incomingMsg]);
+        });
+
+        // Quando alguém entra na sala (Atualiza contador)
+        newSocket.on("participant_joined", (data: any) => {
+          if (data.count) setParticipantsCount(data.count);
+          // Opcional: Mostrar toast "Fulano entrou"
+        });
+
+      } catch (error) {
+        console.error("Erro ao iniciar chat", error);
+      }
+    }
+
+    // Cleanup: Desconecta ao sair da tela
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [id]);
+
+  // 2. Scroll Automático
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  if (!room) {
-    return null;
-  }
 
-  const handleSendMessage = (message: string) => {
-    const newMessage: Message = {
-      id: messages.length + 1,
-      author: nickname,
-      message,
-      time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-      isOwn: true,
-    };
-    setMessages([...messages, newMessage]);
-    toast.success("Mensagem enviada!");
+  // 3. Função de Enviar (Agora via Socket)
+  const handleSendMessage = (messageContent: string) => {
+    if (!socketRef.current || !datasUser || !id) return;
+
+    // EMITIR evento para o backend
+    socketRef.current.emit("send_message", {
+      content: messageContent,
+      senderId: Number(datasUser.sub),
+      roomId: Number(id)
+    });
+
+    // IMPORTANTE: Não fazemos setMessages([...]) aqui!
+    // Esperamos o evento "new_message" voltar do servidor (no useEffect acima)
+    // Isso garante que a mensagem foi salva no banco antes de aparecer.
   };
 
   const handleDeleteMessage = (messageId: number) => {
+    // Para deletar, idealmente você emitiria um evento socket também
     setMessages(messages.filter(msg => msg.id !== messageId));
-    toast.success("Mensagem deletada");
+    toast.success("Mensagem deletada localmente");
   };
 
   return (
@@ -84,10 +144,12 @@ export const DebateChat = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="font-semibold text-lg text-primary-foreground">{room.title}</h1>
+          <h1 className="font-semibold text-lg text-primary-foreground">
+            Chat da Sala {id}
+          </h1>
           <div className="flex items-center gap-1 text-sm text-primary-foreground/80">
             <Users className="h-4 w-4" />
-            <span>{room.participants} participantes</span>
+            <span>{participantsCount > 0 ? participantsCount : "..."} participantes</span>
           </div>
         </div>
       </div>

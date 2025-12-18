@@ -4,13 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface OnboardingProps {
-  onComplete: (nickname: string) => void;
+  onComplete: (nickname: string, pos: { lati: number, long: number }) => void;
 }
 
 export const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [step, setStep] = useState<"welcome" | "nickname" | "location">("welcome");
   const [nickname, setNickname] = useState("");
-
   const handleNicknameSubmit = () => {
     if (nickname.trim()) {
       setStep("location");
@@ -18,19 +17,19 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   };
 
   const handleLocationPermission = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          onComplete(nickname);
-        },
-        () => {
-          // For prototype, continue even if permission denied
-          onComplete(nickname);
-        }
-      );
-    } else {
-      onComplete(nickname);
-    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        console.log(pos);
+        const { latitude, longitude } = pos.coords;
+        const newPos = { lati: latitude, long: longitude };
+
+        onComplete(nickname, newPos);
+      },
+      (error) => {
+        console.error("Erro ao obter localização:", error);
+      }
+    );
+
   };
 
   if (step === "welcome") {

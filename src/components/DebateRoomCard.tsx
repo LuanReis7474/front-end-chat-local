@@ -18,7 +18,7 @@ export const DebateRoomCard = ({
   lastMessage,
 }: DebateRoomCardProps) => {
   const navigate = useNavigate();
-  
+
   return (
     <Card
       className="cursor-pointer transition-all hover:scale-[1.01] hover:shadow-card"
@@ -36,7 +36,7 @@ export const DebateRoomCard = ({
           </div>
           <MessageCircle className="h-5 w-5 text-primary shrink-0" />
         </div>
-        
+
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Users className="h-4 w-4" />

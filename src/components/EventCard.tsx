@@ -25,12 +25,11 @@ export const EventCard = ({
   featured = false,
 }: EventCardProps) => {
   const navigate = useNavigate();
-  
+
   return (
     <Card
-      className={`cursor-pointer transition-all hover:scale-[1.02] hover:shadow-card ${
-        featured ? "bg-gradient-card border-primary/20" : ""
-      }`}
+      className={`cursor-pointer transition-all hover:scale-[1.02] hover:shadow-card ${featured ? "bg-gradient-card border-primary/20" : ""
+        }`}
       onClick={() => navigate(`/event/${id}`)}
     >
       <CardContent className="p-5 space-y-3">
@@ -42,12 +41,8 @@ export const EventCard = ({
             </Badge>
           )}
         </div>
-        
+
         <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-primary" />
-            <span>{date} às {time}</span>
-          </div>
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-primary" />
             <span>{location} • {distance}</span>

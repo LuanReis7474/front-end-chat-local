@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import { DebateChat } from "./pages/DebateChat";
 import { EventChat } from "./pages/EventChat";
 import NotFound from "./pages/NotFound";
+import CreateAccount from "./pages/CreateAccount";
+import Login from "./pages/Login";
+import { CreateRoom } from './pages/CreateRoom';
 
 const queryClient = new QueryClient();
 
@@ -17,10 +20,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/:id" element={<Index />} />
           <Route path="/debate/:id" element={<DebateChat />} />
           <Route path="/event/:id" element={<EventChat />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/create-room" element={<CreateRoom />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

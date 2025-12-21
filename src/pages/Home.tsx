@@ -43,7 +43,7 @@ export const Home = ({ nickname }: HomeProps) => {
         <span className="bg-white text-indigo-600 py-0.5 px-2 rounded text-xs font-bold uppercase mr-3">
           BETA
         </span>
-        <span>Estamos em fase de testes. <a href="#" className="underline hover:text-indigo-200">Dê seu feedback!</a></span>
+        <span>Estamos em fase de testes. <a href="#" className="underline hover:text-indigo-200">Dê seu feedback clicando no link!</a></span>
       </div>
 
       {/* Header */}
